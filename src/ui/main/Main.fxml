@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.MainController">
+   <center>
+      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Algoritmo Genético">
+               <font>
+                  <Font name="Lucida Bright Demibold" size="18.0" />
+               </font>
+            </Label>
+            <TitledPane animated="false" text="Configurações">
+               <content>
+                  <HBox spacing="5.0">
+                     <children>
+                        <VBox minWidth="350.0" spacing="5.0">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <Label minWidth="150.0" text="População:" />
+                                    <Slider fx:id="slPopulacao" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" min="6.0" minorTickCount="0" snapToTicks="true" value="6.0" />
+                                    <TextField fx:id="txtPopulacao" alignment="CENTER_RIGHT" editable="false" maxWidth="50.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <Label minWidth="150.0" text="Taxa de Cruzamento:" />
+                                    <Slider fx:id="slTaxaCruzamento" blockIncrement="0.1" majorTickUnit="0.1" max="90.0" min="60.0" minorTickCount="0" snapToTicks="true" value="60.0" />
+                                    <TextField fx:id="txtTaxaCruzamento" alignment="CENTER_RIGHT" editable="false" maxWidth="50.0" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <Label minWidth="150.0" text="Taxa de Mutação:" />
+                                    <Slider fx:id="slTaxaMutacao" blockIncrement="0.1" majorTickUnit="0.1" max="5.0" minorTickCount="0" snapToTicks="true" value="5.0" />
+                                    <TextField fx:id="txtTaxaMutacao" alignment="CENTER_RIGHT" editable="false" maxWidth="50.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label text="Objetivo" />
+                              <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                 <children>
+                                    <ComboBox fx:id="cboTipoObjetivo" minWidth="100.0" />
+                                    <ComboBox fx:id="cboCampoObjetivo" minWidth="150.0" />
+                                 </children>
+                              </HBox>
+                              <Label text="Restricoes" />
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <ComboBox fx:id="cboRestricao1" minWidth="150.0" />
+                                    <ComboBox fx:id="cboTipoRestricao1" minWidth="75.0" />
+                                    <TextField fx:id="txtValorRestricao1" maxWidth="50.0" minWidth="40.0" />
+                                 </children>
+                              </HBox>
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <ComboBox fx:id="cboRestricao2" minWidth="150.0" />
+                                    <ComboBox fx:id="cboTipoRestricao2" minWidth="75.0" />
+                                    <TextField fx:id="txtValoreRestricao2" maxWidth="50.0" minWidth="40.0" />
+                                 </children>
+                              </HBox>
+                           </children></VBox>
+                     </children>
+                  </HBox>
+               </content>
+            </TitledPane>
+            <HBox>
+               <children>
+                  <TableView fx:id="tblDados" minHeight="200.0" minWidth="400.0" />
+               </children>
+            </HBox>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </center>
+</BorderPane>
