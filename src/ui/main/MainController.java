@@ -5,6 +5,7 @@
  */
 package ui.main;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -12,8 +13,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
@@ -21,7 +26,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.InputMethodEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.Dados;
+import ui.dados.AdicionaDadosController;
 
 /**
  * FXML Controller class
@@ -60,7 +69,7 @@ public class MainController implements Initializable {
     private TextField txtValoreRestricao2;
     @FXML
     private TableView<Dados> tblDados;
-    private ArrayList<Dados> dados;
+    private ArrayList<Dados> dados = new ArrayList<Dados>();
     private ObservableList<Dados> dadosTabela;
 
     /**
@@ -70,10 +79,17 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         definirEventos();
+        valoresIniciais();
         populate();
         configurarTabela();
         carregarDados();
     }    
+    
+    private void valoresIniciais() {
+        slPopulacao.setValue(6);
+        slTaxaCruzamento.setValue(90);
+        slTaxaMutacao.setValue(5);
+    }
     
     private void configurarTabela() {
         TableColumn<Dados, Integer> colPeso = new TableColumn("Peso");
@@ -83,6 +99,9 @@ public class MainController implements Initializable {
         colPeso.setCellValueFactory(new PropertyValueFactory<Dados, Integer>("peso"));
         colVolume.setCellValueFactory(new PropertyValueFactory<Dados, Integer>("volume"));
         colValor.setCellValueFactory(new PropertyValueFactory<Dados, Integer>("valor"));
+        colPeso.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        colVolume.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        colValor.setStyle( "-fx-alignment: CENTER-RIGHT;");
         
         tblDados.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         colPeso.setMaxWidth(1f * Integer.MAX_VALUE * 20);
@@ -153,6 +172,26 @@ public class MainController implements Initializable {
             }
             
         });
+    }
+    
+    public void addDados(Dados dados) {
+        this.dados.add(dados);
+        carregarDados();
+    }
+
+    @FXML
+    private void abrirTelaAdicionaDados(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/dados/AdicionaDados.fxml"));
+        Parent root = loader.load();
+        Scene cena = new Scene(root);
+        Stage stage = new Stage(StageStyle.DECORATED);
+        stage.setResizable(false);
+        stage.setTitle("Incluir Dados");
+        stage.setScene(cena);
+        AdicionaDadosController controller = (AdicionaDadosController) loader.getController();
+        controller.setMainController(this);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
     
 }

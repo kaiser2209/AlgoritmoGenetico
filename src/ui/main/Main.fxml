@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Slider?>
@@ -30,7 +31,7 @@
                               <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label minWidth="150.0" text="População:" />
-                                    <Slider fx:id="slPopulacao" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" min="6.0" minorTickCount="0" snapToTicks="true" value="6.0" />
+                                    <Slider fx:id="slPopulacao" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" min="6.0" minorTickCount="0" snapToTicks="true" value="10.0" />
                                     <TextField fx:id="txtPopulacao" alignment="CENTER_RIGHT" editable="false" maxWidth="50.0" />
                                  </children>
                               </HBox>
@@ -44,7 +45,7 @@
                               <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label minWidth="150.0" text="Taxa de Mutação:" />
-                                    <Slider fx:id="slTaxaMutacao" blockIncrement="0.1" majorTickUnit="0.1" max="5.0" minorTickCount="0" snapToTicks="true" value="5.0" />
+                                    <Slider fx:id="slTaxaMutacao" blockIncrement="0.1" majorTickUnit="0.1" max="5.0" min="1.0" minorTickCount="0" snapToTicks="true" value="1.0" />
                                     <TextField fx:id="txtTaxaMutacao" alignment="CENTER_RIGHT" editable="false" maxWidth="50.0" />
                                  </children>
                               </HBox>
@@ -79,9 +80,14 @@
                   </HBox>
                </content>
             </TitledPane>
-            <HBox>
+            <HBox spacing="5.0">
                <children>
                   <TableView fx:id="tblDados" minHeight="200.0" minWidth="400.0" />
+                  <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#abrirTelaAdicionaDados" text="Adicionar Dados..." />
+                     </children>
+                  </VBox>
                </children>
             </HBox>
          </children>

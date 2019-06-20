@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ui.dados.AdicionaDadosController;
 
 /**
  *
@@ -30,7 +31,8 @@ public class MainApp extends Application {
     }
     
     private void abrirTelaPrincipal(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+        Parent root = loader.load();
         stage.setTitle("Algoritmo Genético");
         stage.setMaximized(false);
         Scene cena = new Scene(root);
