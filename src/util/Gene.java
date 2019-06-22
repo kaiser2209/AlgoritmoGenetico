@@ -13,20 +13,57 @@ import java.util.Random;
  * @author usuario.local
  */
 public class Gene {
-    public static byte[] geraCromossomo(int tamanho) {
+    private int populacao;
+    private Object lista;
+    private String objetivoCampo;
+    private boolean objetivoMax;
+    
+    public static class Builder {
+        private int populacao;
+        private Object lista;
+        private String objetivoCampo;
+        private boolean objetivoMax = true;
+        
+        public Builder(int populacao, Object lista) {
+            this.populacao = populacao;
+            this.lista = lista;
+        }
+        
+        public Gene build() {
+            return new Gene(this);
+        }
+        
+        public Builder objetivo(String campo, boolean max) {
+            objetivoCampo = campo;
+            objetivoMax = max;
+            return this;
+        }
+    }
+    
+    private Gene(Builder builder) {
+        populacao = builder.populacao;
+        lista = builder.lista;
+    }
+    
+    public Gene(ArrayList<Object> lista) {
+        this.lista = lista;
+    }
+    
+    public byte[] geraCromossomo() {
         Random r = new Random();
-        byte[] b = new byte[tamanho];
-        for (int i = 0; i < tamanho; i++) {
+        ArrayList<Object> lista = (ArrayList<Object>) this.lista;
+        byte[] b = new byte[lista.size()];
+        for (int i = 0; i < lista.size(); i++) {
             b[i] = (byte) r.nextInt(2);
         }
         return b;
     }
     
-    public static ArrayList<byte[]> geraCromossomos(int tamanho, int populacao) {
+    public ArrayList<byte[]> geraCromossomos() {
         ArrayList<byte[]> p = new ArrayList<>();
         
-        for (int i = 0; i < populacao; i++) {
-            p.add(geraCromossomo(tamanho));
+        for (int i = 0; i < this.populacao; i++) {
+            p.add(geraCromossomo());
         }
         
         return p;
