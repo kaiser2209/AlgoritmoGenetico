@@ -41,17 +41,23 @@ public class MainApp extends Application {
         dados.add(new Dados(2, 4, 8));
         dados.add(new Dados(3, 6, 9));
         
-        Gene g = new Gene.Builder(6, dados)
+        Gene g = new Gene.Builder(dados)
                 .objetivo("valor", true)
+                .taxaDeCruzamento(0.9f)
+                .taxaDeMutacao(0.05f)
+                .geracoesDesejadas(2000000)
                 .build();
         
+        g.start();
+
+/*        
         for (byte[] bytes : g.geraCromossomos()) {
             for (byte b : bytes) {
                 System.out.print(b);
             }
             System.out.println("");
         }
-        
+*/        
         Object d = new Dados(1, 2, 3);
         Class c = d.getClass();
         String campo = "peso";
