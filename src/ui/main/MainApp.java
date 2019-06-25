@@ -15,8 +15,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Dados;
+import model.DadosGen;
 import ui.dados.AdicionaDadosController;
 import util.Gene;
+import util.Genetico;
 
 /**
  *
@@ -57,21 +59,36 @@ public class MainApp extends Application {
         Locale.setDefault(new Locale("pt", "BR"));
         abrirTelaPrincipal(primaryStage);
         
-        ArrayList<Dados> dados = new ArrayList<>();
-        dados.add(new Dados(2, 4, 8));
-        dados.add(new Dados(3, 6, 9));
-        dados.add(new Dados(7, 8, 2));
-        
+        ArrayList<DadosGen> dados = new ArrayList<>();
+        dados.add(new DadosGen(2, 4, 8));
+        dados.add(new DadosGen(3, 6, 9));
+        dados.add(new DadosGen(7, 8, 2));
+        dados.add(new DadosGen(2, 6, 4));
+        dados.add(new DadosGen(3, 1, 1));
+        dados.add(new DadosGen(3, 5, 7));
+        dados.add(new DadosGen(3, 4, 6));
+        dados.add(new DadosGen(3, 3, 3));
+        /*
         Gene g = new Gene.Builder(dados)
                 .objetivo("valor", true)
                 .restricoes(new String[]{"peso", "volume"}, new String[]{"<=", "<="}, new double[]{10, 15})
                 .taxaDeCruzamento(0.9f)
                 .taxaDeMutacao(0.05f)
-                .geracoesDesejadas(2000000)
+                .geracoesDesejadas(5000)
                 .statusControle(controller.txtStatus)
                 .build();
         
         g.start();
+*/
+        
+        Genetico gene = new Genetico.Builder(dados)
+                .populacao(10)
+                .taxaDeCruzamento(0.85f)
+                .taxaDeMutacao(0.02f)
+                .geracoesDesejadas(200000l)
+                .build();
+        
+        gene.executa();
     }
     
     public static void main(String[] args) {

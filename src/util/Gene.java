@@ -29,8 +29,9 @@ public class Gene {
     private String[] restricoesCampo;
     private String[] restricoesTipo;
     private double[] restricoesValor;
-    private ArrayList<byte[]> cromossomos;
+    private ArrayList<boolean[]> cromossomos;
     private Object controle;
+    private long geracao = 0;
     
     public static class Builder {
         private int populacao = 6;
@@ -44,7 +45,7 @@ public class Gene {
         private String[] restricoesCampo;
         private String[] restricoesTipo;
         private double[] restricoesValor;
-        private ArrayList<byte[]> cromossomos;
+        private ArrayList<boolean[]> cromossomos;
         private Object controle;
         
         public Builder(ArrayList lista) {
@@ -111,90 +112,120 @@ public class Gene {
         restricoesCampo = builder.restricoesCampo;
         restricoesTipo = builder.restricoesTipo;
         restricoesValor = builder.restricoesValor;
+        geracoes = builder.geracoes;
     }
     
     public Gene(ArrayList<Object> lista) {
         this.lista = lista;
     }
     
-    public byte[] geraCromossomo() {
+    public boolean[] geraCromossomo() {
         Random r = new Random();
         ArrayList<Object> l = (ArrayList<Object>) this.lista;
-        byte[] b = new byte[l.size()];
+        boolean[] b = new boolean[l.size()];
         for (int i = 0; i < b.length; i++) {
-            b[i] = (byte) r.nextInt(2);
+            b[i] = r.nextBoolean();
         }
         return b;
     }
     
-    public ArrayList<byte[]> geraCromossomos() {
-        ArrayList<byte[]> p = new ArrayList<>();
+    public ArrayList<DadosCromossomo> geraCromossomos() {
+        ArrayList<DadosCromossomo> p = new ArrayList<>();
         
-        for (int i = 0; i < this.populacao; i++) {
-            p.add(geraCromossomo());
+        for (int i = p.size(); i < this.populacao; i++) {
+            p.add(new DadosCromossomo(geraCromossomo()));
         }
         
         return p;
     }
     
-    public void executa(ArrayList<byte[]> cromossomos) {
-        ArrayList<DadosCromossomo> cromossomosValidos = validaCromossomos(cromossomos);
-        setObjectValue(getCromossomoBits(cromossomosValidos.get(0).cromossomo) + ": " + cromossomosValidos.get(0).valorObjetivo);
-        System.out.println(cromossomosValidos.size());
+    public void geraCromossomos(ArrayList<DadosCromossomo> cromossomo) {
+        for (int i = cromossomo.size(); i < this.populacao; i++) {
+            cromossomo.add(new DadosCromossomo(geraCromossomo()));
+        }
     }
     
-    private ArrayList<DadosCromossomo> validaCromossomos(ArrayList<byte[]> cromossomos) {
-        ArrayList<DadosCromossomo> dados = new ArrayList<>();
+    
+    public ArrayList<DadosCromossomo> executa(ArrayList<DadosCromossomo> cromossomos) {
+        if (geracao < geracoes) {
+            //System.out.println("Geração: " + geracao);
+            //System.out.println("Antes de Avaliar: ");
+            //System.out.println(getCromossomosBits(cromossomos));
+            validaCromossomos(cromossomos);
+            //System.out.println("Depois de Avaliar: ");
+            //System.out.println(getCromossomosBits(cromossomosValidos));
+            //setObjectValue(getCromossomoBits(cromossomosValidos.get(0).cromossomo) + ": " + cromossomosValidos.get(0).valorObjetivo);
+            geraCromossomos(cromossomos);
+            //System.out.println("Após gerar novos cromossomos: ");
+            //System.out.println(getCromossomosBits(cromossomosValidos));
+            geracao += 1;
+            executa(cromossomos);
+        }
         
-        cromossomos.forEach((b) -> {
+        return cromossomos;
+    }
+    
+    private void validaCromossomos(ArrayList<DadosCromossomo> cromossomos) {
+        ArrayList<DadosCromossomo> excluir = new ArrayList<>();
+        
+        cromossomos.forEach((dado) -> {
             double valor = 0;
             double restricao[] = new double[restricoesCampo.length];
-            System.out.println(getCromossomoBits(b));
-            for (int i = 0; i < b.length; i++) {
-                if (b[i] == 1) {
-                    valor += getCromossomoIndexValue(i);
-                    for (int j = 0; j < restricao.length; j++) {
-                        restricao[j] += getCromossomoIndexRestriction(i, j);
+            //System.out.println(getCromossomoBits(dado));
+            for (int i = 0; i < dado.getCromossomo().length; i++) {
+                if (!dado.isAvaliado()) {
+                    if (dado.getCromossomo()[i]) {
+                        valor += getCromossomoIndexValue(i);
+                        for (int j = 0; j < restricao.length; j++) {
+                            restricao[j] += getCromossomoIndexRestriction(i, j);
+                        }
                     }
                 }
             }
             
-            if (!existeRestricao(restricao)) {
-                DadosCromossomo dado = new DadosCromossomo(b, valor, restricao);
-                dados.add(dado);
+            
+            if (existeRestricao(restricao)) {
+                excluir.add(dado);
+            } else {
+                dado.setValorObjetivo(valor);
+                dado.setValorRestricoes(restricao);
+                dado.setAvaliado(true);
             }
             
         });   
         
-        return dados;
+        cromossomos.removeAll(excluir);
     }
     
     private boolean existeRestricao(double[] restricoes) {
         for (int i = 0; i < restricoes.length; i++) {
-            if (restricoesTipo[i].equals("<")) {
-                if (!(restricoes[i] < restricoesValor[i])) {
-                    return true;
-                }
-            } else if (restricoesTipo[i].equals("<=")) {
-                if (!(restricoes[i] <= restricoesValor[i])) {
-                    return true;
-                }
-            } else if (restricoesTipo[i].equals(">")) {
-                if (!(restricoes[i] > restricoesValor[i])) {
-                    return true;
-                }
-            } else if (restricoesTipo[i].equals(">=")) {
-                if (!(restricoes[i] >= restricoesValor[i])) {
-                    return true;
-                }
-            } else if (restricoesTipo[i].equals("!=")) {
-                if (!(restricoes[i] != restricoesValor[i])) {
-                    return true;
-                }
-            } else if (restricoesTipo[i].equals("==")) {
-                if (!(restricoes[i] == restricoesValor[i])) {
-                    return true;
-                }
+            switch (restricoesTipo[i]) {
+                case "<":
+                    if (!(restricoes[i] < restricoesValor[i])) {
+                        return true;
+                    }   break;
+                case "<=":
+                    if (!(restricoes[i] <= restricoesValor[i])) {
+                        return true;
+                    }   break;
+                case ">":
+                    if (!(restricoes[i] > restricoesValor[i])) {
+                        return true;
+                    }   break;
+                case ">=":
+                    if (!(restricoes[i] >= restricoesValor[i])) {
+                        return true;
+                    }   break;
+                case "!=":
+                    if (!(restricoes[i] != restricoesValor[i])) {
+                        return true;
+                    }   break;
+                case "==":
+                    if (!(restricoes[i] == restricoesValor[i])) {
+                        return true;
+                    }   break;
+                default:
+                    break;
             }
         }
         
@@ -210,7 +241,7 @@ public class Gene {
         try {
             pd = new PropertyDescriptor(objetivoCampo, dados.getClass());
             valor = (double) pd.getReadMethod().invoke(dados);
-            System.out.println(index + ": " + valor);
+            //System.out.println(index + ": " + valor);
             //System.out.println(valor);
         } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(Gene.class.getName()).log(Level.SEVERE, null, ex);
@@ -236,14 +267,32 @@ public class Gene {
         return valor;
     }
     
-    public String getCromossomoBits(byte[] cromossomo) {
+    public String getCromossomoBits(boolean[] cromossomo) {
         String valor = "";
         
-        for (byte b : cromossomo) {
-            valor += String.valueOf(b);
+        for (boolean b : cromossomo) {
+            if (b) {
+                valor += "1";
+            } else {
+                valor += "0";
+            }
         }
         
         return valor;
+    }
+    
+    public String getCromossomosBits(ArrayList<DadosCromossomo> cromossomos) {
+        String valor = "";
+        
+        for (DadosCromossomo c : cromossomos) {
+            valor += getCromossomoBits(c.getCromossomo()) + "\n";
+        }
+        
+        return valor;
+    }
+    
+    public String getCromossomoBits(DadosCromossomo cromossomo) {
+        return getCromossomoBits(cromossomo.getCromossomo());
     }
     
     public void setObjectValue(Object value) {
@@ -263,33 +312,41 @@ public class Gene {
             
             @Override
             public void run() {
-                g.cromossomos = g.geraCromossomos();
+                ArrayList<DadosCromossomo> d = g.geraCromossomos();
                 
                 if (!(controle == null)) {
-                    g.setObjectValue("" + g.cromossomos.size());
+                    g.setObjectValue("" + d.size());
                 }
                 
-                g.executa(g.cromossomos);
+                //g.executa(d);
+                System.out.println(getCromossomosBits(g.executa(d)));
+                System.out.println("Geração: " + geracao);
             }
         }.start();
     }
     
     public class DadosCromossomo implements Comparable<DadosCromossomo> {
-        private byte[] cromossomo;
+        private boolean[] cromossomo;
         private double valorObjetivo;
         private double[] valorRestricoes;
+        private boolean avaliado;
         
-        public DadosCromossomo(byte[] cromossomo, double valorObjetivo, double[] valorRestricoes) {
-            this.cromossomo = cromossomo;
+        public DadosCromossomo(boolean[] cromossomo, double valorObjetivo, double[] valorRestricoes) {
+            this(cromossomo);
             this.valorObjetivo = valorObjetivo;
             this.valorRestricoes = valorRestricoes;
+            avaliado = true;
+        }
+        
+        public DadosCromossomo(boolean[] cromossomo) {
+            this.cromossomo = cromossomo;
         }
 
-        public byte[] getCromossomo() {
+        public boolean[] getCromossomo() {
             return cromossomo;
         }
 
-        public void setCromossomo(byte[] cromossomo) {
+        public void setCromossomo(boolean[] cromossomo) {
             this.cromossomo = cromossomo;
         }
 
@@ -307,6 +364,14 @@ public class Gene {
 
         public void setValorRestricoes(double[] valorRestricoes) {
             this.valorRestricoes = valorRestricoes;
+        }
+
+        public boolean isAvaliado() {
+            return avaliado;
+        }
+
+        public void setAvaliado(boolean avaliado) {
+            this.avaliado = avaliado;
         }
         
         @Override
