@@ -86,6 +86,7 @@
                   <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Button mnemonicParsing="false" onAction="#abrirTelaAdicionaDados" text="Adicionar Dados..." />
+                        <TextField fx:id="txtStatus" />
                      </children>
                   </VBox>
                </children>

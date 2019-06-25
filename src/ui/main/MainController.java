@@ -71,6 +71,8 @@ public class MainController implements Initializable {
     private TableView<Dados> tblDados;
     private ArrayList<Dados> dados = new ArrayList<Dados>();
     private ObservableList<Dados> dadosTabela;
+    @FXML
+    public TextField txtStatus;
 
     /**
      * Initializes the controller class.
