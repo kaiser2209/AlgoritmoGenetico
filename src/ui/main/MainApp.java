@@ -85,7 +85,9 @@ public class MainApp extends Application {
                 .populacao(10)
                 .taxaDeCruzamento(0.85f)
                 .taxaDeMutacao(0.02f)
-                .geracoesDesejadas(200000l)
+                .geracoesDesejadas(1l)
+                .limiteDePeso(25)
+                .limiteDeVolume(25)
                 .build();
         
         gene.executa();
