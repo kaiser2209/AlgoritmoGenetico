@@ -6,6 +6,7 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import model.DadosGen;
 
@@ -60,9 +61,17 @@ public class Genetico {
         String valor = "";
         
         for (DadosCromossomo b : cromossomos) {
-            valor += getCromossomoBits(b.getCromossomo()) + " - " + 
-                    getRestricoesCromossomos(b) + "\n";
+            valor += getCromossomosDados(b) + "\n";
         }
+        
+        return valor;
+    }
+    
+    public String getCromossomosDados(DadosCromossomo cromossomo) {
+        String valor = "";
+        
+        valor += getCromossomoBits(cromossomo.getCromossomo()) + " - " +
+                getRestricoesCromossomos(cromossomo);
         
         return valor;
     }
@@ -80,72 +89,159 @@ public class Genetico {
         return valor;
     }
     
-    public int[] avaliaCromossomo(boolean[] cromossomo) { 
-        int[] valor;
-        do {
-            valor = new int[3];
-            for (int i = 0; i < cromossomo.length; i++) {
-                if (cromossomo[i]) {
-                    valor[0] += lista.get(i).getValor();
-                    valor[1] += lista.get(i).getPeso();
-                    valor[2] += lista.get(i).getVolume();
+    public void calculaDadosCromossomo(DadosCromossomo cromossomo) {
+        if (!cromossomo.isCalculado()) {
+            cromossomo.limpaValores();
+            for (int i = 0; i < cromossomo.getCromossomo().length; i++) {
+                if (cromossomo.getCromossomo()[i]) {
+                    cromossomo.valor += lista.get(i).getValor();
+                    cromossomo.peso += lista.get(i).getPeso();
+                    cromossomo.volume += lista.get(i).getVolume();
                 }
             }
-            if (valor[1] > limitePeso || valor[2] > limiteVolume) {
-                reparaCromossomo(cromossomo);
-            }
-        } while (valor[1] > limitePeso || valor[2] > limiteVolume);
-        
-        return valor;
+            cromossomo.setCalculado(true);
+        }
     }
     
-    public void reparaCromossomo(boolean[] cromossomo) {
+    public void avaliaCromossomo(DadosCromossomo cromossomo) {
+        while (cromossomo.getPeso() > limitePeso || cromossomo.getVolume() > limiteVolume) {
+            cromossomo.setCalculado(false);
+            reparaCromossomo(cromossomo);
+        }
+    }
+    
+    public void reparaCromossomo(DadosCromossomo cromossomo) {
         int bitsAtivos = 0;
         int posicao;
-        for (boolean b : cromossomo) {
+        
+        for (boolean b : cromossomo.getCromossomo()) {
             if (b) {
                 bitsAtivos++;
             }
         }
+        
         Random r = new Random();
         posicao = r.nextInt(bitsAtivos);
         
-        for (int i = 0; i < cromossomo.length; i++) {
-            if (cromossomo[i]) {
+        for (int i = 0; i < cromossomo.getCromossomo().length; i++) {
+            if (cromossomo.getCromossomo()[i]) {
                 if (posicao == 0) {
-                    cromossomo[i] = false;
+                    cromossomo.getCromossomo()[i] = false;
                 }
                 posicao--;
             }
         }
-        
+        calculaDadosCromossomo(cromossomo);
     }
     
-    public void avaliaCromossomos() {
+    public void avaliaCromossomos(ArrayList<DadosCromossomo> cromossomos) {
         ArrayList<DadosCromossomo> listaExclusao = new ArrayList<>();
         for (DadosCromossomo dados : cromossomos) {
-            int valor = 0, peso = 0, volume = 0;
-            int valores[] = avaliaCromossomo(dados.getCromossomo());
-            valor = valores[0];
-            peso = valores[1];
-            volume = valores[2];
-          
-            if (peso > limitePeso || volume > limiteVolume) {
-                listaExclusao.add(dados);
-            } else {
-                dados.valor = valor;
-                dados.peso = peso;
-                dados.volume = volume;
-            }
+            calculaDadosCromossomo(dados);
+            avaliaCromossomo(dados);
         }
-
-        cromossomos.removeAll(listaExclusao);
-        System.out.println("Depois da Avaliação: ");
-        System.out.println(getCromossomosDados(cromossomos));
+        Collections.sort(cromossomos);
+        //System.out.println(getCromossomosDados(cromossomos));
+    }
+    
+    public ArrayList<DadosCromossomo> cruzaCromossomos(DadosCromossomo pai1, DadosCromossomo pai2) {
+        ArrayList<DadosCromossomo> filhos = new ArrayList<>();
+        float aleatorio;
+        
+        Random r = new Random();
+        aleatorio = r.nextFloat();
+        
+        if (aleatorio <= taxaDeCruzamento) {
+            int pos = r.nextInt(lista.size() - 1) + 1 ;
+            boolean[][] filho = new boolean[2][lista.size()];
+            for (int i = 0; i < lista.size(); i++) {
+                if (pos > i) {
+                    filho[0][i] = pai1.getCromossomo()[i];
+                    filho[1][i] = pai2.getCromossomo()[i];
+                } else {
+                    filho[0][i] = pai2.getCromossomo()[i];
+                    filho[1][i] = pai1.getCromossomo()[i];
+                }
+            }
+            
+            filhos.add(new DadosCromossomo(filho[0]));
+            filhos.add(new DadosCromossomo(filho[1]));
+        } else {
+            filhos.add(pai1);
+            filhos.add(pai2);
+        }
+        
+        return filhos;
     }
     
     public void realizaCruzamento() {
+        int[] valoresAcumulados = calculaAcumulado(cromossomos);
+        ArrayList<DadosCromossomo> paisSelecionados = new ArrayList<>();
+        ArrayList<DadosCromossomo> novaPopulacao = new ArrayList<>();
+        while (paisSelecionados.size() < (populacao - 2)) {
+            paisSelecionados.add(selecionaCromossomo(valoresAcumulados, cromossomos));
+        }
+        for (int i = 0; i < paisSelecionados.size(); i += 2 ) {
+            novaPopulacao.addAll(cruzaCromossomos(paisSelecionados.get(i), paisSelecionados.get(i + 1)));
+        }
         
+        //System.out.println("Pais Selecionados: ");
+        //System.out.println(getCromossomosDados(paisSelecionados));
+        //System.out.println("Filhos Gerados: ");
+        //System.out.println(getCromossomosDados(novaPopulacao));
+        
+        novaPopulacao.add(cromossomos.get(0));
+        novaPopulacao.add(cromossomos.get(1));
+        
+        //System.out.println("Nova População: ");
+        //System.out.println(getCromossomosDados(novaPopulacao));
+        
+        avaliaCromossomos(novaPopulacao);
+        cromossomos = novaPopulacao;
+        
+        //System.out.println("Nova População Ordenada: ");
+        //System.out.println(getCromossomosDados(novaPopulacao));
+
+    }
+    
+    public void realizaMutacao(ArrayList<DadosCromossomo> cromossomos) {
+        Random r = new Random();
+        float resultado;
+        for (DadosCromossomo d : cromossomos) {
+            for (int i = 0; i < d.getCromossomo().length; i++) {
+                resultado = r.nextFloat();
+                if (resultado < taxaDeMutacao) {
+                    d.getCromossomo()[i] = !d.getCromossomo()[i];
+                    d.setCalculado(false);
+                    //System.out.println("Mutou");
+                }
+            }
+        }
+        
+        avaliaCromossomos(cromossomos);
+    }
+    
+    public DadosCromossomo selecionaCromossomo(int[] valores, ArrayList<DadosCromossomo> cromossomos) {
+        Random r = new Random();
+        int selecao = r.nextInt(valores[0]);
+        for (int i = valores.length - 1; i >= 0; i--) {
+            if (selecao < valores[i]) {
+                return cromossomos.get(i);
+            }
+        }
+        
+        return null;
+    }
+    
+    private int[] calculaAcumulado(ArrayList<DadosCromossomo> cromossomos) {
+        int[] resultado = new int[cromossomos.size()];
+            for (int i = cromossomos.size(); i > 0; i--) {
+                resultado[i - 1] = cromossomos.get(i - 1).getValor();
+                if (i < cromossomos.size()) {
+                    resultado[i - 1] += resultado[i];
+                }
+            }
+        return resultado;
     }
     
     public void executa() {
@@ -156,14 +252,19 @@ public class Genetico {
             public void run() {
                 do {
                     geraCromossomos();
-                    System.out.println("Antes da Avaliação: ");
-                    System.out.println(getCromossomosDados(cromossomos));
-                    avaliaCromossomos();
+                    avaliaCromossomos(cromossomos);
                     realizaCruzamento();
+                    //System.out.println("Antes da Mutação: ");
+                    //System.out.println(getCromossomosDados(cromossomos));
+                    realizaMutacao(cromossomos);
+                    //System.out.println("Após a Mutação: ");
+                    //System.out.println(getCromossomosDados(cromossomos));
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
                 } while (geracao < geracoes);
                 System.out.println(geracao);
+                System.out.println("Melhor Reslutado: ");
+                System.out.println(getCromossomosDados(cromossomos));
             }
         }.start();
     }
@@ -216,12 +317,12 @@ public class Genetico {
         }
     }
     
-    public class DadosCromossomo {
+    public class DadosCromossomo implements Comparable<DadosCromossomo> {
         private boolean[] cromossomo;
         private int valor;
         private int peso;
         private int volume;
-        private boolean avaliado;
+        private boolean calculado;
         
         public DadosCromossomo(boolean[] cromossomo) {
             this.cromossomo = cromossomo;
@@ -266,12 +367,29 @@ public class Genetico {
             this.volume = volume;
         }
 
-        public boolean isAvaliado() {
-            return avaliado;
+        public boolean isCalculado() {
+            return calculado;
         }
 
-        public void setAvaliado(boolean avaliado) {
-            this.avaliado = avaliado;
+        public void setCalculado(boolean calculado) {
+            this.calculado = calculado;
+        }
+        
+        public void limpaValores() {
+            this.valor = 0;
+            this.peso = 0;
+            this.volume = 0;
+        }
+
+        @Override
+        public int compareTo(DadosCromossomo o) {
+            if (this.getValor() > o.getValor()) {
+                return -1;
+            }
+            if (this.getValor() < o.getValor()) {
+                return 1;
+            }
+            return 0;
         }
     }
 }

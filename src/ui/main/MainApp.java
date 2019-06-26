@@ -30,32 +30,13 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         /*
-        Gene g = new Gene();
-        ArrayList<byte[]> lista = g.geraCromossomos();
-        for (byte[] l : lista) {
-            for (byte b : l) {
-                System.out.print(b);
-            }
-            System.out.println("");
-        }
-        
-*/
-        
-
-/*        
-        for (byte[] bytes : g.geraCromossomos()) {
-            for (byte b : bytes) {
-                System.out.print(b);
-            }
-            System.out.println("");
-        }
-*/        
         Object d = new Dados(1, 2, 3);
         Class c = d.getClass();
         String campo = "peso";
         Field valor = c.getDeclaredField(campo);
         valor.setAccessible(true);
         //System.out.println(valor.get(d));
+*/
         Locale.setDefault(new Locale("pt", "BR"));
         abrirTelaPrincipal(primaryStage);
         
@@ -68,25 +49,14 @@ public class MainApp extends Application {
         dados.add(new DadosGen(3, 5, 7));
         dados.add(new DadosGen(3, 4, 6));
         dados.add(new DadosGen(3, 3, 3));
-        /*
-        Gene g = new Gene.Builder(dados)
-                .objetivo("valor", true)
-                .restricoes(new String[]{"peso", "volume"}, new String[]{"<=", "<="}, new double[]{10, 15})
-                .taxaDeCruzamento(0.9f)
-                .taxaDeMutacao(0.05f)
-                .geracoesDesejadas(5000)
-                .statusControle(controller.txtStatus)
-                .build();
-        
-        g.start();
-*/
+        dados.add(new DadosGen(8, 6, 1));
         
         Genetico gene = new Genetico.Builder(dados)
                 .populacao(10)
-                .taxaDeCruzamento(0.85f)
-                .taxaDeMutacao(0.02f)
-                .geracoesDesejadas(1l)
-                .limiteDePeso(25)
+                .taxaDeCruzamento(0.9f)
+                .taxaDeMutacao(0.05f)
+                .geracoesDesejadas(200000l)
+                .limiteDePeso(30)
                 .limiteDeVolume(25)
                 .build();
         
