@@ -50,17 +50,23 @@ public class MainApp extends Application {
         dados.add(new DadosGen(3, 4, 6));
         dados.add(new DadosGen(3, 3, 3));
         dados.add(new DadosGen(8, 6, 1));
+        dados.add(new DadosGen(4, 1, 1));
+        dados.add(new DadosGen(4, 3, 2));
+        dados.add(new DadosGen(6, 3, 7));
+        dados.add(new DadosGen(9, 9, 4));
         
         Genetico gene = new Genetico.Builder(dados)
-                .populacao(10)
+                .populacao(20)
                 .taxaDeCruzamento(0.9f)
                 .taxaDeMutacao(0.05f)
-                .geracoesDesejadas(200000l)
+                .geracoesDesejadas(2000l)
                 .limiteDePeso(30)
                 .limiteDeVolume(25)
+                .controleStatus(controller.getStatusText())
                 .build();
         
         gene.executa();
+        
     }
     
     public static void main(String[] args) {

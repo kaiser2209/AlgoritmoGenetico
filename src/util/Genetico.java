@@ -5,9 +5,14 @@
  */
 package util;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.DadosGen;
 
 /**
@@ -24,6 +29,7 @@ public class Genetico {
     private long geracoes;
     private ArrayList<DadosCromossomo> cromossomos = new ArrayList<>();
     private long geracao;
+    private Object controle;
     
     public Genetico(Builder builder) {
         populacao = builder.populacao;
@@ -33,6 +39,7 @@ public class Genetico {
         lista = builder.lista;
         limitePeso = builder.limitePeso;
         limiteVolume = builder.limiteVolume;
+        controle = builder.controle;
     }
     
     public void geraCromossomos() {
@@ -135,13 +142,11 @@ public class Genetico {
     }
     
     public void avaliaCromossomos(ArrayList<DadosCromossomo> cromossomos) {
-        ArrayList<DadosCromossomo> listaExclusao = new ArrayList<>();
         for (DadosCromossomo dados : cromossomos) {
             calculaDadosCromossomo(dados);
             avaliaCromossomo(dados);
         }
         Collections.sort(cromossomos);
-        //System.out.println(getCromossomosDados(cromossomos));
     }
     
     public ArrayList<DadosCromossomo> cruzaCromossomos(DadosCromossomo pai1, DadosCromossomo pai2) {
@@ -187,17 +192,20 @@ public class Genetico {
         
         //System.out.println("Pais Selecionados: ");
         //System.out.println(getCromossomosDados(paisSelecionados));
-        //System.out.println("Filhos Gerados: ");
-        //System.out.println(getCromossomosDados(novaPopulacao));
-        
+        System.out.println("Geração: " + geracao);
+        System.out.println("Antes de substituir: ");
+        System.out.println(getCromossomosDados(cromossomos));
+        realizaMutacao(novaPopulacao);
         novaPopulacao.add(cromossomos.get(0));
         novaPopulacao.add(cromossomos.get(1));
         
         //System.out.println("Nova População: ");
         //System.out.println(getCromossomosDados(novaPopulacao));
         
-        avaliaCromossomos(novaPopulacao);
+        //avaliaCromossomos(novaPopulacao);
         cromossomos = novaPopulacao;
+        System.out.println("Depois de substituir: ");
+        System.out.println(getCromossomosDados(cromossomos));
         
         //System.out.println("Nova População Ordenada: ");
         //System.out.println(getCromossomosDados(novaPopulacao));
@@ -217,7 +225,6 @@ public class Genetico {
                 }
             }
         }
-        
         avaliaCromossomos(cromossomos);
     }
     
@@ -244,23 +251,42 @@ public class Genetico {
         return resultado;
     }
     
+    public void setObjectValue(Object value) {
+        if (!(controle == null)) {
+            PropertyDescriptor pd;
+
+            try {
+                pd = new PropertyDescriptor("text", controle.getClass());
+                pd.getWriteMethod().invoke(controle, value);
+            } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                Logger.getLogger(Gene.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     public void executa() {
         new Thread() {
             Genetico g = Genetico.this;
             
             @Override
             public void run() {
+                geraCromossomos();
                 do {
-                    geraCromossomos();
                     avaliaCromossomos(cromossomos);
                     realizaCruzamento();
                     //System.out.println("Antes da Mutação: ");
                     //System.out.println(getCromossomosDados(cromossomos));
-                    realizaMutacao(cromossomos);
+                    //realizaMutacao(cromossomos);
                     //System.out.println("Após a Mutação: ");
                     //System.out.println(getCromossomosDados(cromossomos));
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
+                    //setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
+                    try {
+                        sleep(20);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Genetico.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } while (geracao < geracoes);
                 System.out.println(geracao);
                 System.out.println("Melhor Resultado: ");
@@ -277,6 +303,7 @@ public class Genetico {
         private float taxaDeCruzamento = 0.9f;
         private float taxaDeMutacao = 0.05f;
         private long geracoes = 10000l;
+        private Object controle = null;
         
         public Genetico build() {
             return new Genetico(this);
@@ -313,6 +340,11 @@ public class Genetico {
         
         public Builder limiteDeVolume(int volume) {
             this.limiteVolume = volume;
+            return this;
+        }
+        
+        public Builder controleStatus(Object controle) {
+            this.controle = controle;
             return this;
         }
     }

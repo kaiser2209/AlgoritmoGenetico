@@ -20,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -179,6 +180,10 @@ public class MainController implements Initializable {
     public void addDados(Dados dados) {
         this.dados.add(dados);
         carregarDados();
+    }
+    
+    public TextField getStatusText() {
+        return this.txtStatus;
     }
 
     @FXML
