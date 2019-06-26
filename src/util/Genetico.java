@@ -80,18 +80,45 @@ public class Genetico {
         return valor;
     }
     
-    public int[] avaliaCromossomo(boolean[] cromossomo) {
-        int[] valor = new int[3];
+    public int[] avaliaCromossomo(boolean[] cromossomo) { 
+        int[] valor;
+        do {
+            valor = new int[3];
+            for (int i = 0; i < cromossomo.length; i++) {
+                if (cromossomo[i]) {
+                    valor[0] += lista.get(i).getValor();
+                    valor[1] += lista.get(i).getPeso();
+                    valor[2] += lista.get(i).getVolume();
+                }
+            }
+            if (valor[1] > limitePeso || valor[2] > limiteVolume) {
+                reparaCromossomo(cromossomo);
+            }
+        } while (valor[1] > limitePeso || valor[2] > limiteVolume);
+        
+        return valor;
+    }
+    
+    public void reparaCromossomo(boolean[] cromossomo) {
+        int bitsAtivos = 0;
+        int posicao;
+        for (boolean b : cromossomo) {
+            if (b) {
+                bitsAtivos++;
+            }
+        }
+        Random r = new Random();
+        posicao = r.nextInt(bitsAtivos);
         
         for (int i = 0; i < cromossomo.length; i++) {
             if (cromossomo[i]) {
-                valor[0] += lista.get(i).getValor();
-                valor[1] += lista.get(i).getPeso();
-                valor[2] += lista.get(i).getVolume();
+                if (posicao == 0) {
+                    cromossomo[i] = false;
+                }
+                posicao--;
             }
         }
         
-        return valor;
     }
     
     public void avaliaCromossomos() {
@@ -102,6 +129,7 @@ public class Genetico {
             valor = valores[0];
             peso = valores[1];
             volume = valores[2];
+          
             if (peso > limitePeso || volume > limiteVolume) {
                 listaExclusao.add(dados);
             } else {
@@ -110,8 +138,7 @@ public class Genetico {
                 dados.volume = volume;
             }
         }
-        System.out.println("Antes da Avaliação: ");
-        System.out.println(getCromossomosDados(cromossomos));
+
         cromossomos.removeAll(listaExclusao);
         System.out.println("Depois da Avaliação: ");
         System.out.println(getCromossomosDados(cromossomos));
@@ -129,6 +156,8 @@ public class Genetico {
             public void run() {
                 do {
                     geraCromossomos();
+                    System.out.println("Antes da Avaliação: ");
+                    System.out.println(getCromossomosDados(cromossomos));
                     avaliaCromossomos();
                     realizaCruzamento();
                     geracao++;
