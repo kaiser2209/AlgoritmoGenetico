@@ -263,7 +263,7 @@ public class Genetico {
                     //System.out.println(g.getCromossomosBits(cromossomos));
                 } while (geracao < geracoes);
                 System.out.println(geracao);
-                System.out.println("Melhor Reslutado: ");
+                System.out.println("Melhor Resultado: ");
                 System.out.println(getCromossomosDados(cromossomos));
             }
         }.start();
