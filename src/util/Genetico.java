@@ -156,9 +156,10 @@ public class Genetico {
         Random r = new Random();
         aleatorio = r.nextFloat();
         
+        boolean[][] filho = new boolean[2][lista.size()];
         if (aleatorio <= taxaDeCruzamento) {
             int pos = r.nextInt(lista.size() - 1) + 1 ;
-            boolean[][] filho = new boolean[2][lista.size()];
+            
             for (int i = 0; i < lista.size(); i++) {
                 if (pos > i) {
                     filho[0][i] = pai1.getCromossomo()[i];
@@ -168,19 +169,21 @@ public class Genetico {
                     filho[1][i] = pai1.getCromossomo()[i];
                 }
             }
-            
-            filhos.add(new DadosCromossomo(filho[0]));
-            filhos.add(new DadosCromossomo(filho[1]));
         } else {
-            filhos.add(pai1);
-            filhos.add(pai2);
+            for (int i = 0; i < lista.size(); i++) {
+                filho[0][i] = pai1.getCromossomo()[i];
+                filho[1][i] = pai2.getCromossomo()[i];
+            }
         }
+        filhos.add(new DadosCromossomo(filho[0]));
+        filhos.add(new DadosCromossomo(filho[1]));
         
         return filhos;
     }
     
     public void realizaCruzamento() {
         int[] valoresAcumulados = calculaAcumulado(cromossomos);
+        ArrayList<DadosCromossomo> melhoresAnterior = new ArrayList<>();
         ArrayList<DadosCromossomo> paisSelecionados = new ArrayList<>();
         ArrayList<DadosCromossomo> novaPopulacao = new ArrayList<>();
         while (paisSelecionados.size() < (populacao - 2)) {
@@ -190,22 +193,26 @@ public class Genetico {
             novaPopulacao.addAll(cruzaCromossomos(paisSelecionados.get(i), paisSelecionados.get(i + 1)));
         }
         
+        melhoresAnterior.add(cromossomos.get(0));
+        melhoresAnterior.add(cromossomos.get(1));
         //System.out.println("Pais Selecionados: ");
         //System.out.println(getCromossomosDados(paisSelecionados));
-        System.out.println("Geração: " + geracao);
-        System.out.println("Antes de substituir: ");
-        System.out.println(getCromossomosDados(cromossomos));
+        //System.out.println("Geração: " + geracao);
+        //System.out.println("Antes de substituir: ");
+        //System.out.println(getCromossomosDados(cromossomos));
         realizaMutacao(novaPopulacao);
-        novaPopulacao.add(cromossomos.get(0));
-        novaPopulacao.add(cromossomos.get(1));
+        //System.out.println("Maiores");
+        //System.out.println(getCromossomosDados(cromossomos.get(0)));
+        //System.out.println(getCromossomosDados(cromossomos.get(1)));
+        //System.out.println("=================================================");
         
         //System.out.println("Nova População: ");
         //System.out.println(getCromossomosDados(novaPopulacao));
-        
-        //avaliaCromossomos(novaPopulacao);
+        novaPopulacao.addAll(melhoresAnterior);
+        Collections.sort(novaPopulacao);
         cromossomos = novaPopulacao;
-        System.out.println("Depois de substituir: ");
-        System.out.println(getCromossomosDados(cromossomos));
+        //System.out.println("Depois de substituir: ");
+        //System.out.println(getCromossomosDados(cromossomos));
         
         //System.out.println("Nova População Ordenada: ");
         //System.out.println(getCromossomosDados(novaPopulacao));
@@ -281,9 +288,9 @@ public class Genetico {
                     //System.out.println(getCromossomosDados(cromossomos));
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
-                    //setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
+                    setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
                     try {
-                        sleep(20);
+                        sleep(25);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Genetico.class.getName()).log(Level.SEVERE, null, ex);
                     }
