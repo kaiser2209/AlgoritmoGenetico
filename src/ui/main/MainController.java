@@ -31,6 +31,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.Dados;
+import org.controlsfx.control.StatusBar;
 import ui.dados.AdicionaDadosController;
 
 /**
@@ -53,27 +54,19 @@ public class MainController implements Initializable {
     @FXML
     private TextField txtTaxaMutacao;
     @FXML
-    private ComboBox<String> cboTipoObjetivo;
-    @FXML
-    private ComboBox<String> cboCampoObjetivo;
-    @FXML
-    private ComboBox<String> cboRestricao1;
-    @FXML
-    private ComboBox<String> cboTipoRestricao1;
-    @FXML
-    private TextField txtValorRestricao1;
-    @FXML
-    private ComboBox<String> cboRestricao2;
-    @FXML
-    private ComboBox<String> cboTipoRestricao2;
-    @FXML
-    private TextField txtValoreRestricao2;
-    @FXML
     private TableView<Dados> tblDados;
     private ArrayList<Dados> dados = new ArrayList<Dados>();
     private ObservableList<Dados> dadosTabela;
     @FXML
     public TextField txtStatus;
+    @FXML
+    private TextField txtLimitePeso;
+    @FXML
+    private TextField txtLimiteVolume;
+    @FXML
+    private StatusBar sbStatus;
+    @FXML
+    private Label lblStatus;
 
     /**
      * Initializes the controller class.
@@ -83,7 +76,6 @@ public class MainController implements Initializable {
         // TODO
         definirEventos();
         valoresIniciais();
-        populate();
         configurarTabela();
         carregarDados();
     }    
@@ -119,38 +111,6 @@ public class MainController implements Initializable {
         tblDados.setItems(dadosTabela);
     }
     
-    private void populate() {
-        cboTipoObjetivo.getItems().addAll(
-            "Máx.",
-            "Min.");
-        cboCampoObjetivo.getItems().addAll(
-            "Valor",
-            "Peso",
-            "Volume");
-        cboRestricao1.getItems().addAll(
-            "Valor",
-            "Peso",
-            "Volume");
-        cboRestricao2.getItems().addAll(
-            "Valor",
-            "Peso",
-            "Volume");
-        cboTipoRestricao1.getItems().addAll(
-            "<",
-            "<=",
-            "=",
-            "<>",
-            ">",
-            ">=");
-        cboTipoRestricao2.getItems().addAll(
-            "<",
-            "<=",
-            "=",
-            "<>",
-            ">",
-            ">=");
-    }
-    
     private void definirEventos() {
         slPopulacao.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -184,6 +144,14 @@ public class MainController implements Initializable {
     
     public TextField getStatusText() {
         return this.txtStatus;
+    }
+    
+    public StatusBar getStatusBar() {
+        return this.sbStatus;
+    }
+    
+    public Label getStatusLabel() {
+        return this.lblStatus;
     }
 
     @FXML

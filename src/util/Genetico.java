@@ -13,7 +13,12 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Service;
 import model.DadosGen;
+import org.controlsfx.control.StatusBar;
 
 /**
  *
@@ -30,6 +35,8 @@ public class Genetico {
     private ArrayList<DadosCromossomo> cromossomos = new ArrayList<>();
     private long geracao;
     private Object controle;
+    private StringProperty mensagem;
+    private Service<Void> servicoMensagem;
     
     public Genetico(Builder builder) {
         populacao = builder.populacao;
@@ -40,6 +47,8 @@ public class Genetico {
         limitePeso = builder.limitePeso;
         limiteVolume = builder.limiteVolume;
         controle = builder.controle;
+        mensagem = builder.mensagem;
+        servicoMensagem = builder.servicoMensagem;
     }
     
     public void geraCromossomos() {
@@ -271,12 +280,22 @@ public class Genetico {
         }
     }
     
+    public void setObjectValue(String value) {
+        mensagem.set(value);
+    }
+    
     public void executa() {
+        
+        
+        
         new Thread() {
             Genetico g = Genetico.this;
+            long tempoInicial, tempoAtual, tempoFinal;
             
             @Override
             public void run() {
+                tempoInicial = System.currentTimeMillis();
+                tempoFinal = tempoInicial + 20;
                 geraCromossomos();
                 do {
                     avaliaCromossomos(cromossomos);
@@ -288,13 +307,18 @@ public class Genetico {
                     //System.out.println(getCromossomosDados(cromossomos));
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
-                    setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
+                    if (System.currentTimeMillis() >= tempoFinal) {
+                        setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
+                        tempoFinal = System.currentTimeMillis() + 50;
+                    }
+                    /*
                     try {
-                        sleep(25);
+                        sleep(1);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Genetico.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    } */
                 } while (geracao < geracoes);
+                setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
                 System.out.println(geracao);
                 System.out.println("Melhor Resultado: ");
                 System.out.println(getCromossomosDados(cromossomos));
@@ -311,6 +335,8 @@ public class Genetico {
         private float taxaDeMutacao = 0.05f;
         private long geracoes = 10000l;
         private Object controle = null;
+        private StringProperty mensagem = null;
+        private Service<Void> servicoMensagem = null;
         
         public Genetico build() {
             return new Genetico(this);
@@ -352,6 +378,16 @@ public class Genetico {
         
         public Builder controleStatus(Object controle) {
             this.controle = controle;
+            return this;
+        }
+        
+        public Builder mensagemStatus(StringProperty mensagem) {
+            this.mensagem = mensagem;
+            return this;
+        }
+        
+        public Builder servicoMensagem(Service<Void> servico) {
+            servicoMensagem = servico;
             return this;
         }
     }

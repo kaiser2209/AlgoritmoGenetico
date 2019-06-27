@@ -6,18 +6,18 @@
 package ui.main;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Locale;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import model.Dados;
 import model.DadosGen;
-import ui.dados.AdicionaDadosController;
-import util.Gene;
 import util.Genetico;
 
 /**
@@ -26,6 +26,8 @@ import util.Genetico;
  */
 public class MainApp extends Application {
     private MainController controller;
+    private Service<Void> mensagem;
+    private StringProperty mensagemStatus = new SimpleStringProperty();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -59,10 +61,11 @@ public class MainApp extends Application {
                 .populacao(20)
                 .taxaDeCruzamento(0.9f)
                 .taxaDeMutacao(0.05f)
-                .geracoesDesejadas(2000l)
+                .geracoesDesejadas(2000000l)
                 .limiteDePeso(30)
                 .limiteDeVolume(25)
-                .controleStatus(controller.getStatusText())
+                .controleStatus(controller.getStatusBar())
+                .mensagemStatus(mensagemStatus)
                 .build();
         
         gene.executa();
@@ -77,10 +80,33 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
         Parent root = loader.load();
         controller = (MainController) loader.getController();
+        criarTarefa();
+        controller.getStatusBar().textProperty().bind(mensagem.messageProperty());
+        controller.getStatusLabel().textProperty().bind(mensagem.messageProperty());
+        mensagem.start();
         stage.setTitle("Algoritmo Genético");
         stage.setMaximized(false);
         Scene cena = new Scene(root);
         stage.setScene(cena);
         stage.show();
+    }
+    
+    private void criarTarefa() {
+        mensagem = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        while (true) {
+                            updateMessage(mensagemStatus.get());
+                            Thread.sleep(100);
+                        }
+                    }
+                    
+                };
+            }
+            
+        };
     }
 }

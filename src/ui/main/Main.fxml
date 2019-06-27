@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableView?>
@@ -10,9 +9,9 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.StatusBar?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.MainController">
    <center>
@@ -25,14 +24,14 @@
             </Label>
             <TitledPane animated="false" text="Configurações">
                <content>
-                  <HBox spacing="5.0">
+                  <HBox spacing="20.0">
                      <children>
                         <VBox minWidth="350.0" spacing="5.0">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label minWidth="150.0" text="População:" />
-                                    <Slider fx:id="slPopulacao" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" min="6.0" minorTickCount="0" snapToTicks="true" value="10.0" />
+                                    <Slider fx:id="slPopulacao" blockIncrement="1.0" majorTickUnit="1.0" max="20.0" min="6.0" minorTickCount="0" snapToTicks="true" value="10.0" />
                                     <TextField fx:id="txtPopulacao" alignment="CENTER_RIGHT" editable="false" maxWidth="50.0" />
                                  </children>
                               </HBox>
@@ -57,23 +56,20 @@
                               <Label text="Objetivo" />
                               <HBox alignment="CENTER_LEFT" spacing="5.0">
                                  <children>
-                                    <ComboBox fx:id="cboTipoObjetivo" minWidth="100.0" />
-                                    <ComboBox fx:id="cboCampoObjetivo" minWidth="150.0" />
+                                    <TextField editable="false" text="Maximizar Valor" />
                                  </children>
                               </HBox>
                               <Label text="Restricoes" />
-                              <HBox spacing="5.0">
+                              <HBox alignment="CENTER_LEFT" spacing="5.0">
                                  <children>
-                                    <ComboBox fx:id="cboRestricao1" minWidth="150.0" />
-                                    <ComboBox fx:id="cboTipoRestricao1" minWidth="75.0" />
-                                    <TextField fx:id="txtValorRestricao1" maxWidth="50.0" minWidth="40.0" />
+                                    <Label minWidth="100.0" text="Limite de Peso:" />
+                                    <TextField fx:id="txtLimitePeso" alignment="CENTER_RIGHT" maxWidth="100.0" minWidth="80.0" text="6000" />
                                  </children>
                               </HBox>
-                              <HBox spacing="5.0">
+                              <HBox alignment="CENTER_LEFT" spacing="5.0">
                                  <children>
-                                    <ComboBox fx:id="cboRestricao2" minWidth="150.0" />
-                                    <ComboBox fx:id="cboTipoRestricao2" minWidth="75.0" />
-                                    <TextField fx:id="txtValoreRestricao2" maxWidth="50.0" minWidth="40.0" />
+                                    <Label minWidth="100.0" text="Limite de Volume:" />
+                                    <TextField fx:id="txtLimiteVolume" alignment="CENTER_RIGHT" maxWidth="100.0" minWidth="80.0" text="350" />
                                  </children>
                               </HBox>
                            </children></VBox>
@@ -88,6 +84,8 @@
                      <children>
                         <Button mnemonicParsing="false" onAction="#abrirTelaAdicionaDados" text="Adicionar Dados..." />
                         <TextField fx:id="txtStatus" />
+                        <TextField fx:id="txtStatus" editable="false" />
+                        <Label fx:id="lblStatus" minWidth="200.0" text="Label" />
                      </children>
                   </VBox>
                </children>
@@ -102,13 +100,6 @@
       </VBox>
    </center>
    <bottom>
-      <StackPane alignment="CENTER_LEFT" BorderPane.alignment="CENTER_LEFT">
-         <children>
-            <TextField fx:id="txtStatus" editable="false" />
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </BorderPane.margin>
-      </StackPane>
+      <StatusBar fx:id="sbStatus" text="" BorderPane.alignment="CENTER" />
    </bottom>
 </BorderPane>
