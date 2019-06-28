@@ -280,8 +280,10 @@ public class Genetico {
         }
     }
     
-    public void setObjectValue(String value) {
+    public void setObjectValue(String value, double barra) {
         mensagem.set(value);
+        StatusBar sb = (StatusBar) controle;
+        sb.progressProperty().set(barra);
     }
     
     public void executa() {
@@ -308,7 +310,7 @@ public class Genetico {
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
                     if (System.currentTimeMillis() >= tempoFinal) {
-                        setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
+                        setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)), (1.0 * geracao / geracoes));
                         tempoFinal = System.currentTimeMillis() + 50;
                     }
                     /*
@@ -318,7 +320,7 @@ public class Genetico {
                         Logger.getLogger(Genetico.class.getName()).log(Level.SEVERE, null, ex);
                     } */
                 } while (geracao < geracoes);
-                setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)));
+                setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)), (1.0 * geracao / geracoes));
                 System.out.println(geracao);
                 System.out.println("Melhor Resultado: ");
                 System.out.println(getCromossomosDados(cromossomos));
