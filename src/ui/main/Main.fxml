@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.StatusBar?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.MainController">
+<BorderPane fx:id="principal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.main.MainController">
    <center>
       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
@@ -79,13 +80,60 @@
             </TitledPane>
             <HBox spacing="5.0">
                <children>
-                  <TableView fx:id="tblDados" minHeight="200.0" minWidth="400.0" />
-                  <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                  <HBox spacing="5.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#abrirTelaAdicionaDados" text="Adicionar Dados..." />
-                        <TextField fx:id="txtStatus" />
-                        <TextField fx:id="txtStatus" editable="false" />
-                        <Label fx:id="lblStatus" minWidth="200.0" text="Label" />
+                        <TableView fx:id="tblDados" minHeight="200.0" />
+                        <VBox minWidth="120.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Button fx:id="btnAdiciona" minWidth="120.0" mnemonicParsing="false" onAction="#abrirTelaAdicionaDados" text="Adicionar Dados..." />
+                              <Button fx:id="btnApaga" minWidth="120.0" mnemonicParsing="false" onAction="#apagarDadoSelecionado" text="Apagar Dado..." />
+                              <Button fx:id="btnLimpaTabela" minWidth="120.0" mnemonicParsing="false" onAction="#limparDadosTabela" text="Limpar Tabela" />
+                              <Button fx:id="btnSalvar" minWidth="120.0" mnemonicParsing="false" onAction="#salvarDados" text="Salvar Dados..." />
+                              <Button fx:id="btnCarregar" minWidth="120.0" mnemonicParsing="false" onAction="#carregarDados" text="Carregar Dados..." />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <VBox spacing="5.0">
+                     <children>
+                        <HBox alignment="CENTER">
+                           <children>
+                              <Label alignment="CENTER" contentDisplay="CENTER" text="Algoritmo" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Lucida Bright Demibold" size="18.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <Label text="Critério de Parada:" />
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <RadioButton fx:id="chkParadaPorGeracao" minWidth="180.0" mnemonicParsing="false" selected="true" text="Número de Gerações:" />
+                              <TextField fx:id="txtNumeroGeracoes" alignment="CENTER_RIGHT" text="200000" />
+                           </children>
+                        </HBox>
+                        <RadioButton fx:id="chkParadaPorConvergencia" mnemonicParsing="false" text="Convergência da Função Objetivo" />
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Button minWidth="100.0" mnemonicParsing="false" onAction="#executarAlgoritmo" text="Executar" HBox.hgrow="ALWAYS" />
+                              <Button minWidth="100.0" mnemonicParsing="false" onAction="#pararAlgoritmo" text="Parar" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER">
+                           <children>
+                              <Label text="Resultados">
+                                 <font>
+                                    <Font name="Lucida Bright Demibold" size="18.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="5.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#mostraResultado" text="Melhor Resultado" />
+                              <Button mnemonicParsing="false" onAction="#mostraGrafico" text="Gráfico de Evolução" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>

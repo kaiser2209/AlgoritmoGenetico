@@ -5,6 +5,7 @@
  */
 package util;
 
+import excecoes.DadosInsuficientesException;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +38,8 @@ public class Genetico {
     private Object controle;
     private StringProperty mensagem;
     private Service<Void> servicoMensagem;
+    private Thread execucaoAlgoritmo;
+    private boolean algoritmoInterrompido = false;
     
     public Genetico(Builder builder) {
         populacao = builder.populacao;
@@ -192,10 +195,16 @@ public class Genetico {
     
     public void realizaCruzamento() {
         int[] valoresAcumulados = calculaAcumulado(cromossomos);
+        int reduzPopulacao;
         ArrayList<DadosCromossomo> melhoresAnterior = new ArrayList<>();
         ArrayList<DadosCromossomo> paisSelecionados = new ArrayList<>();
         ArrayList<DadosCromossomo> novaPopulacao = new ArrayList<>();
-        while (paisSelecionados.size() < (populacao - 2)) {
+        if ((populacao % 2) == 1) {
+            reduzPopulacao = 1;
+        } else {
+            reduzPopulacao = 2;
+        }
+        while (paisSelecionados.size() < (populacao - reduzPopulacao)) {
             paisSelecionados.add(selecionaCromossomo(valoresAcumulados, cromossomos));
         }
         for (int i = 0; i < paisSelecionados.size(); i += 2 ) {
@@ -203,7 +212,9 @@ public class Genetico {
         }
         
         melhoresAnterior.add(cromossomos.get(0));
-        melhoresAnterior.add(cromossomos.get(1));
+        if (reduzPopulacao == 2) {
+            melhoresAnterior.add(cromossomos.get(1));
+        }
         //System.out.println("Pais Selecionados: ");
         //System.out.println(getCromossomosDados(paisSelecionados));
         //System.out.println("Geração: " + geracao);
@@ -286,11 +297,13 @@ public class Genetico {
         sb.progressProperty().set(barra);
     }
     
-    public void executa() {
+    public void executa() throws DadosInsuficientesException {
         
+        if (lista.size() < 5) {
+            throw new DadosInsuficientesException("É necessário informar pelo menos 5 dados.");
+        }
         
-        
-        new Thread() {
+        execucaoAlgoritmo = new Thread() {
             Genetico g = Genetico.this;
             long tempoInicial, tempoAtual, tempoFinal;
             
@@ -319,13 +332,24 @@ public class Genetico {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Genetico.class.getName()).log(Level.SEVERE, null, ex);
                     } */
+                    if (algoritmoInterrompido) {
+                        break;
+                    }
                 } while (geracao < geracoes);
                 setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)), (1.0 * geracao / geracoes));
-                System.out.println(geracao);
-                System.out.println("Melhor Resultado: ");
-                System.out.println(getCromossomosDados(cromossomos));
+                //System.out.println(geracao);
+                //System.out.println("Melhor Resultado: ");
+                //System.out.println(getCromossomosDados(cromossomos));
+                algoritmoInterrompido = false;
+                geracao = 0;
             }
-        }.start();
+        };
+        
+        execucaoAlgoritmo.start();
+    }
+    
+    public void para() {
+        algoritmoInterrompido = true;
     }
     
     public static class Builder {

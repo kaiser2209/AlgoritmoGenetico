@@ -26,8 +26,7 @@ import util.Genetico;
  */
 public class MainApp extends Application {
     private MainController controller;
-    private Service<Void> mensagem;
-    private StringProperty mensagemStatus = new SimpleStringProperty();
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -57,19 +56,6 @@ public class MainApp extends Application {
         dados.add(new DadosGen(6, 3, 7));
         dados.add(new DadosGen(9, 9, 4));
         
-        Genetico gene = new Genetico.Builder(dados)
-                .populacao(20)
-                .taxaDeCruzamento(0.9f)
-                .taxaDeMutacao(0.05f)
-                .geracoesDesejadas(2000000l)
-                .limiteDePeso(30)
-                .limiteDeVolume(25)
-                .controleStatus(controller.getStatusBar())
-                .mensagemStatus(mensagemStatus)
-                .build();
-        
-        gene.executa();
-        
     }
     
     public static void main(String[] args) {
@@ -80,33 +66,10 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
         Parent root = loader.load();
         controller = (MainController) loader.getController();
-        criarTarefa();
-        controller.getStatusBar().textProperty().bind(mensagem.messageProperty());
-        controller.getStatusLabel().textProperty().bind(mensagem.messageProperty());
-        mensagem.start();
         stage.setTitle("Algoritmo Genético");
         stage.setMaximized(false);
         Scene cena = new Scene(root);
         stage.setScene(cena);
         stage.show();
-    }
-    
-    private void criarTarefa() {
-        mensagem = new Service<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                return new Task<Void>() {
-                    @Override
-                    protected Void call() throws Exception {
-                        while (true) {
-                            updateMessage(mensagemStatus.get());
-                            Thread.sleep(100);
-                        }
-                    }
-                    
-                };
-            }
-            
-        };
     }
 }

@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.Dados;
+import model.DadosGen;
 import ui.main.MainController;
 
 /**
@@ -47,7 +48,7 @@ public class AdicionaDadosController implements Initializable {
 
     @FXML
     private void salvarDados(ActionEvent event) {
-        Dados d = new Dados(
+        DadosGen d = new DadosGen(
             Integer.parseInt(txtValor.getText()),
             Integer.parseInt(txtPeso.getText()),
             Integer.parseInt(txtVolume.getText()));

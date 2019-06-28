@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package util;
+package excecoes;
 
 /**
  *
  * @author guard
  */
-public class IsNotArrayListException extends Exception {
-    public IsNotArrayListException() {
-        super("O objeto não é um ArrayList");
+public class DadosInsuficientesException extends Exception {
+    public DadosInsuficientesException(String msg) {
+        super(msg);
     }
 }
