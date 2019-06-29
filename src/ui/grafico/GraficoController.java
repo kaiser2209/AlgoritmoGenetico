@@ -22,7 +22,7 @@ import util.Genetico;
 public class GraficoController implements Initializable {
 
     @FXML
-    private LineChart<String, Integer> graficoEvolucao;
+    private LineChart<Integer, Integer> graficoEvolucao;
     
     private ArrayList<Genetico.DadosCromossomo> melhores;
     private int geracoes;
@@ -38,20 +38,27 @@ public class GraficoController implements Initializable {
     public void setInformacoes(ArrayList<Genetico.DadosCromossomo> melhores, int geracoes) {
         this.melhores = melhores;
         this.geracoes = geracoes;
-        System.out.println(melhores.size());
+
         int[] dadosGeracao = new int[melhores.size()];
         XYChart.Data[] linhaValor = new XYChart.Data[melhores.size()];
+       
         
-        XYChart.Series<String, Integer> valor = new XYChart.Series<>();
+        XYChart.Series<Integer, Integer> valor = new XYChart.Series<>();
         valor.setName("Valor");
+        XYChart.Series<Integer, Integer> peso = new XYChart.Series<>();
+        peso.setName("Peso");
+        XYChart.Series<Integer, Integer> volume = new XYChart.Series<>();
+        volume.setName("Volume");
         
         
         
         for (int i = 0; i < melhores.size(); i++) {
-            valor.getData().add(new XYChart.Data<>(String.valueOf(i), melhores.get(i).getValor()));
+            valor.getData().add(new XYChart.Data<>(i, melhores.get(i).getValor()));
+            peso.getData().add(new XYChart.Data<>(i, melhores.get(i).getPeso()));
+            volume.getData().add(new XYChart.Data<>(i, melhores.get(i).getVolume()));
         }
         
-        graficoEvolucao.getData().add(valor);
+        graficoEvolucao.getData().addAll(valor);
     }
     
 }

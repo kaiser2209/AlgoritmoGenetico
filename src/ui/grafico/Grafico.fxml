@@ -5,15 +5,14 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.layout.BorderPane?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.grafico.GraficoController">
    <center>
-      <LineChart fx:id="graficoEvolucao" title="Gráfico de Evolução" BorderPane.alignment="CENTER">
+      <LineChart fx:id="graficoEvolucao" alternativeRowFillVisible="false" animated="false" createSymbols="false" horizontalGridLinesVisible="false" title="Gráfico de Evolução" verticalGridLinesVisible="false" verticalZeroLineVisible="false" BorderPane.alignment="CENTER">
         <xAxis>
-          <CategoryAxis side="BOTTOM" />
+          <NumberAxis label="Gerações" side="BOTTOM" />
         </xAxis>
         <yAxis>
-          <NumberAxis side="LEFT" />
+          <NumberAxis fx:id="eixoY" animated="false" label="Valor" layoutX="10.0" minorTickCount="0" side="LEFT" tickLength="10.0" />
         </yAxis>
       </LineChart>
    </center>

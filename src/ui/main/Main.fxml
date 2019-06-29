@@ -115,8 +115,8 @@
                         <RadioButton fx:id="chkParadaPorConvergencia" mnemonicParsing="false" text="Convergência da Função Objetivo" />
                         <HBox alignment="CENTER" spacing="10.0">
                            <children>
-                              <Button minWidth="100.0" mnemonicParsing="false" onAction="#executarAlgoritmo" text="Executar" HBox.hgrow="ALWAYS" />
-                              <Button minWidth="100.0" mnemonicParsing="false" onAction="#pararAlgoritmo" text="Parar" HBox.hgrow="ALWAYS" />
+                              <Button fx:id="btnExecutar" minWidth="100.0" mnemonicParsing="false" onAction="#executarAlgoritmo" text="Executar" HBox.hgrow="ALWAYS" />
+                              <Button fx:id="btnParar" minWidth="100.0" mnemonicParsing="false" onAction="#pararAlgoritmo" text="Parar" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER">
@@ -130,8 +130,8 @@
                         </HBox>
                         <HBox alignment="CENTER" spacing="5.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#mostraResultado" text="Melhor Resultado" />
-                              <Button mnemonicParsing="false" onAction="#mostraGrafico" text="Gráfico de Evolução" />
+                              <Button fx:id="btnResultado" mnemonicParsing="false" onAction="#mostraResultado" text="Melhor Resultado" />
+                              <Button fx:id="btnGrafico" mnemonicParsing="false" onAction="#mostraGrafico" text="Gráfico de Evolução" />
                            </children>
                         </HBox>
                      </children>

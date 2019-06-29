@@ -20,6 +20,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import model.DadosGen;
 import org.controlsfx.control.StatusBar;
+import ui.main.MainController;
 
 /**
  *
@@ -44,6 +45,9 @@ public class Genetico {
     private boolean convergenciaAtingida = false;
     public static ArrayList<DadosCromossomo> melhores = new ArrayList<>();
     public static int totalGeracoes = 0;
+    private static DadosCromossomo melhorResultado;
+    private static int geracaoMelhorResultado;
+    private MainController mainController;
     
     public Genetico(Builder builder) {
         populacao = builder.populacao;
@@ -57,6 +61,7 @@ public class Genetico {
         mensagem = builder.mensagem;
         servicoMensagem = builder.servicoMensagem;
         convergenciaAtivada = builder.convergenciaAtivada;
+        mainController = builder.mainController;
     }
     
     public void geraCromossomos() {
@@ -337,6 +342,11 @@ public class Genetico {
                             convergenciaAtingida = repeticoesMelhorValor > 15000;
                         }
                         
+                        if (melhores.get((int) geracao).valor > melhores.get((int) geracao - 1).valor) {
+                            melhorResultado = melhores.get((int) geracao);
+                            geracaoMelhorResultado = (int) geracao;
+                        }
+                        
                     }
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
@@ -360,6 +370,7 @@ public class Genetico {
                         break;
                     }
                 } while (true);
+                mainController.estadoBotoes();
                 setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)), (1.0 * geracao / geracoes));
                 //System.out.println(geracao);
                 //System.out.println("Melhor Resultado: ");
@@ -400,6 +411,7 @@ public class Genetico {
         private boolean convergenciaAtivada = false;
         private StringProperty mensagem = null;
         private Service<Void> servicoMensagem = null;
+        private MainController mainController = null;
         
         public Genetico build() {
             return new Genetico(this);
@@ -456,6 +468,11 @@ public class Genetico {
         
         public Builder usarParadaPorConvergencia(boolean usar) {
             convergenciaAtivada = usar;
+            return this;
+        }
+        
+        public Builder setMainController(MainController mainController) {
+            this.mainController = mainController;
             return this;
         }
     }
@@ -534,5 +551,13 @@ public class Genetico {
             }
             return 0;
         }
+    }
+    
+    public static DadosCromossomo getMelhorIndividuo() {
+        return melhorResultado;
+    }
+    
+    public static int getMelhorGeracao() {
+        return geracaoMelhorResultado;
     }
 }

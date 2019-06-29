@@ -18,8 +18,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -30,7 +28,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -39,7 +36,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
@@ -48,17 +44,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import model.Dados;
 import model.DadosGen;
 import org.controlsfx.control.StatusBar;
 import ui.dados.AdicionaDadosController;
 import ui.grafico.GraficoController;
+import ui.resultado.ResultadoController;
 import util.AlertDialog;
 import util.Genetico;
 
@@ -83,7 +78,7 @@ public class MainController implements Initializable {
     private TextField txtTaxaMutacao;
     @FXML
     private TableView<DadosGen> tblDados;
-    private ArrayList<DadosGen> dados = new ArrayList<>();
+    private static ArrayList<DadosGen> dados = new ArrayList<>();
     private ObservableList<DadosGen> dadosTabela;
     public TextField txtStatus;
     @FXML
@@ -115,6 +110,14 @@ public class MainController implements Initializable {
     private Button btnCarregar;
     @FXML
     private BorderPane principal;
+    @FXML
+    private Button btnResultado;
+    @FXML
+    private Button btnGrafico;
+    @FXML
+    private Button btnExecutar;
+    @FXML
+    private Button btnParar;
 
     /**
      * Initializes the controller class.
@@ -280,7 +283,8 @@ public class MainController implements Initializable {
 
     @FXML
     private void executarAlgoritmo(ActionEvent event) { 
-       
+        btnParar.setDisable(false);
+        btnExecutar.setDisable(true);
         int populacao = (int) slPopulacao.getValue();
         float taxaDeCruzamento = (float) slTaxaCruzamento.getValue();
         float taxaDeMutacao = (float) slTaxaMutacao.getValue();
@@ -302,6 +306,7 @@ public class MainController implements Initializable {
                     .controleStatus(getStatusBar())
                     .mensagemStatus(mensagemStatus)
                     .usarParadaPorConvergencia(chkParadaPorConvergencia.isSelected())
+                    .setMainController(this)
                     .build();
         
 
@@ -314,12 +319,25 @@ public class MainController implements Initializable {
 
     @FXML
     private void pararAlgoritmo(ActionEvent event) {
+        btnParar.setDisable(true);
+        btnExecutar.setDisable(false);
         gene.para();
         gene = null;
     }
 
     @FXML
-    private void mostraResultado(ActionEvent event) {
+    private void mostraResultado(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/resultado/Resultado.fxml"));
+        Parent root = loader.load();
+        Scene cena = new Scene(root);
+        Stage stage = new Stage(StageStyle.DECORATED);
+        stage.setResizable(false);
+        stage.setTitle("Resultado");
+        stage.setScene(cena);
+        ResultadoController controller = (ResultadoController) loader.getController();
+        //controller.setInformacoes(Genetico.melhores, Genetico.totalGeracoes);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     @FXML
@@ -358,10 +376,14 @@ public class MainController implements Initializable {
         }
     }
     
-    private void estadoBotoes() {
+    public void estadoBotoes() {
         //System.out.println(tblDados.getSelectionModel().getSelectedIndex());
         btnApaga.setDisable(dados.isEmpty() || tblDados.getSelectionModel().getSelectedIndex() < 0);
         btnLimpaTabela.setDisable(dados.isEmpty());
+        btnResultado.setDisable(Genetico.melhores.size() == 0);
+        btnGrafico.setDisable(Genetico.melhores.size() == 0);
+        btnExecutar.setDisable(false);
+        btnParar.setDisable(true);
     }
 
     @FXML
@@ -412,6 +434,10 @@ public class MainController implements Initializable {
             }
         }
         
+    }
+    
+    public static ArrayList<DadosGen> getDados() {
+        return MainController.dados;
     }
     
 }
