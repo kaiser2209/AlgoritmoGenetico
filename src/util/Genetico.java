@@ -36,10 +36,14 @@ public class Genetico {
     private ArrayList<DadosCromossomo> cromossomos = new ArrayList<>();
     private long geracao;
     private Object controle;
+    private boolean convergenciaAtivada;
     private StringProperty mensagem;
     private Service<Void> servicoMensagem;
     private Thread execucaoAlgoritmo;
     private boolean algoritmoInterrompido = false;
+    private boolean convergenciaAtingida = false;
+    public static ArrayList<DadosCromossomo> melhores = new ArrayList<>();
+    public static int totalGeracoes = 0;
     
     public Genetico(Builder builder) {
         populacao = builder.populacao;
@@ -52,6 +56,7 @@ public class Genetico {
         controle = builder.controle;
         mensagem = builder.mensagem;
         servicoMensagem = builder.servicoMensagem;
+        convergenciaAtivada = builder.convergenciaAtivada;
     }
     
     public void geraCromossomos() {
@@ -309,6 +314,7 @@ public class Genetico {
             
             @Override
             public void run() {
+                int repeticoesMelhorValor = 0;
                 tempoInicial = System.currentTimeMillis();
                 tempoFinal = tempoInicial + 20;
                 geraCromossomos();
@@ -320,6 +326,18 @@ public class Genetico {
                     //realizaMutacao(cromossomos);
                     //System.out.println("Após a Mutação: ");
                     //System.out.println(getCromossomosDados(cromossomos));
+                    salvarMelhorCromossomo(cromossomos.get(0));
+                    if (geracao > 0) {
+                        if (melhores.get((int) geracao - 1).valor == melhores.get((int) geracao).valor) {
+                            repeticoesMelhorValor++;
+                        } else {
+                            repeticoesMelhorValor = 0;
+                        }
+                        if (convergenciaAtivada) {
+                            convergenciaAtingida = repeticoesMelhorValor > 15000;
+                        }
+                        
+                    }
                     geracao++;
                     //System.out.println(g.getCromossomosBits(cromossomos));
                     if (System.currentTimeMillis() >= tempoFinal) {
@@ -332,20 +350,38 @@ public class Genetico {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Genetico.class.getName()).log(Level.SEVERE, null, ex);
                     } */
-                    if (algoritmoInterrompido) {
+                    if (!convergenciaAtivada) {
+                        if (geracao >= geracoes) {
+                            break;
+                        }
+                    }
+                    
+                    if (algoritmoInterrompido || convergenciaAtingida) {
                         break;
                     }
-                } while (geracao < geracoes);
+                } while (true);
                 setObjectValue("Geração: " + String.format("%8d", geracao) + ": " + getCromossomosDados(cromossomos.get(0)), (1.0 * geracao / geracoes));
                 //System.out.println(geracao);
                 //System.out.println("Melhor Resultado: ");
                 //System.out.println(getCromossomosDados(cromossomos));
+                totalGeracoes = (int) geracao;
                 algoritmoInterrompido = false;
                 geracao = 0;
             }
         };
         
         execucaoAlgoritmo.start();
+    }
+    
+    private void salvarMelhorCromossomo(DadosCromossomo cromossomo) {
+        DadosCromossomo melhor;
+        boolean[] b = new boolean[cromossomo.getCromossomo().length];
+        
+        System.arraycopy(cromossomo.getCromossomo(), 0, b, 0, b.length);
+        
+        melhor = new DadosCromossomo(b, cromossomo.getValor(), cromossomo.getPeso(), cromossomo.getVolume());
+        
+        melhores.add(melhor);
     }
     
     public void para() {
@@ -361,6 +397,7 @@ public class Genetico {
         private float taxaDeMutacao = 0.05f;
         private long geracoes = 10000l;
         private Object controle = null;
+        private boolean convergenciaAtivada = false;
         private StringProperty mensagem = null;
         private Service<Void> servicoMensagem = null;
         
@@ -414,6 +451,11 @@ public class Genetico {
         
         public Builder servicoMensagem(Service<Void> servico) {
             servicoMensagem = servico;
+            return this;
+        }
+        
+        public Builder usarParadaPorConvergencia(boolean usar) {
+            convergenciaAtivada = usar;
             return this;
         }
     }

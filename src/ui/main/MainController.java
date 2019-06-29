@@ -5,8 +5,12 @@
  */
 package ui.main;
 
+import excecoes.ArquivoNoFormatoInvalidoException;
 import excecoes.DadosInsuficientesException;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -54,6 +58,7 @@ import model.Dados;
 import model.DadosGen;
 import org.controlsfx.control.StatusBar;
 import ui.dados.AdicionaDadosController;
+import ui.grafico.GraficoController;
 import util.AlertDialog;
 import util.Genetico;
 
@@ -153,7 +158,6 @@ public class MainController implements Initializable {
         tblDados.getColumns().addAll(colPeso, colVolume, colValor);
     }
     
-    @FXML
     private void carregarDados() {
         dadosTabela = FXCollections.observableArrayList(dados);
         tblDados.setItems(dadosTabela);
@@ -262,11 +266,11 @@ public class MainController implements Initializable {
     private void salvarCSV(File file) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             for (DadosGen d : dados) {
+                writer.print(d.getValor());
+                writer.print(",");
                 writer.print(d.getPeso());
                 writer.print(",");
-                writer.print(d.getVolume());
-                writer.print(",");
-                writer.println(d.getValor());
+                writer.println(d.getVolume());
             }
         } catch (IOException e) {
 
@@ -287,7 +291,7 @@ public class MainController implements Initializable {
             criarTarefa();
             getStatusBar().textProperty().bind(mensagem.messageProperty());
             mensagem.start();
-
+            Genetico.melhores.clear();
             gene = new Genetico.Builder(dados)
                     .populacao(populacao)
                     .taxaDeCruzamento(taxaDeCruzamento)
@@ -297,6 +301,7 @@ public class MainController implements Initializable {
                     .limiteDeVolume(limiteDeVolume)
                     .controleStatus(getStatusBar())
                     .mensagemStatus(mensagemStatus)
+                    .usarParadaPorConvergencia(chkParadaPorConvergencia.isSelected())
                     .build();
         
 
@@ -318,7 +323,18 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void mostraGrafico(ActionEvent event) {
+    private void mostraGrafico(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/grafico/Grafico.fxml"));
+        Parent root = loader.load();
+        Scene cena = new Scene(root);
+        Stage stage = new Stage(StageStyle.DECORATED);
+        stage.setResizable(false);
+        stage.setTitle("Gráfico de Evolução");
+        stage.setScene(cena);
+        GraficoController controller = (GraficoController) loader.getController();
+        controller.setInformacoes(Genetico.melhores, Genetico.totalGeracoes);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     @FXML
@@ -346,6 +362,56 @@ public class MainController implements Initializable {
         //System.out.println(tblDados.getSelectionModel().getSelectedIndex());
         btnApaga.setDisable(dados.isEmpty() || tblDados.getSelectionModel().getSelectedIndex() < 0);
         btnLimpaTabela.setDisable(dados.isEmpty());
+    }
+
+    @FXML
+    private void abrirDados(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos CSV (*.csv)", "*.csv");
+        fileChooser.getExtensionFilters().add(extFilter);
+        
+        File file = fileChooser.showOpenDialog((Stage) principal.getScene().getWindow());
+        
+        if (file == null) {
+            return;
+        }
+        
+        String linha = null;
+        BufferedReader stream = null;
+        
+        try {
+            ArrayList<DadosGen> lista = new ArrayList<>();
+            stream = new BufferedReader(new FileReader(file));
+            while (((linha = stream.readLine()) != null)) {
+                String dadosLidos[] = linha.split(",");
+                if (dadosLidos.length != 3) {
+                    throw new ArquivoNoFormatoInvalidoException("O arquivo informado não pode ser aberto.");
+                }
+                lista.add(new DadosGen(Integer.valueOf(dadosLidos[0]),
+                        Integer.valueOf(dadosLidos[1]),
+                        Integer.valueOf(dadosLidos[2])));
+            }
+            
+            dados = lista;
+            carregarDados();
+            estadoBotoes();
+        } catch (FileNotFoundException e) {
+            AlertDialog.showMessage("Erro", e.getMessage(), Alert.AlertType.ERROR);
+        } catch (ArquivoNoFormatoInvalidoException e) {
+            AlertDialog.showConfirmMessage("Erro", e.getMessage(), Alert.AlertType.ERROR);
+        } catch (IOException e) {
+            AlertDialog.showConfirmMessage("Erro", e.getMessage(), Alert.AlertType.ERROR);
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    AlertDialog.showConfirmMessage("Erro", e.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        }
+        
     }
     
 }

@@ -89,7 +89,7 @@
                               <Button fx:id="btnApaga" minWidth="120.0" mnemonicParsing="false" onAction="#apagarDadoSelecionado" text="Apagar Dado..." />
                               <Button fx:id="btnLimpaTabela" minWidth="120.0" mnemonicParsing="false" onAction="#limparDadosTabela" text="Limpar Tabela" />
                               <Button fx:id="btnSalvar" minWidth="120.0" mnemonicParsing="false" onAction="#salvarDados" text="Salvar Dados..." />
-                              <Button fx:id="btnCarregar" minWidth="120.0" mnemonicParsing="false" onAction="#carregarDados" text="Carregar Dados..." />
+                              <Button fx:id="btnCarregar" minWidth="120.0" mnemonicParsing="false" onAction="#abrirDados" text="Carregar Dados..." />
                            </children>
                         </VBox>
                      </children>
