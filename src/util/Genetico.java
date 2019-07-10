@@ -45,8 +45,8 @@ public class Genetico {
     private boolean convergenciaAtingida = false;
     public static ArrayList<DadosCromossomo> melhores = new ArrayList<>();
     public static int totalGeracoes = 0;
-    private static DadosCromossomo melhorResultado;
-    private static int geracaoMelhorResultado;
+    private static DadosCromossomo melhorResultado = null;
+    private static int geracaoMelhorResultado = 0;
     private MainController mainController;
     
     public Genetico(Builder builder) {
